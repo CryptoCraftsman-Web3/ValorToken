@@ -10,11 +10,11 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `StandardToken` functions.
  */
-contract SimpleToken is StandardToken {
+contract ValorToken is StandardToken {
 
-  string public constant name = "ValorToken"; //  to be approved
-  string public constant symbol = "VALOR"; //  to be approved
-  uint8 public constant decimals = 18; //  to be approved
+  string public constant name    =   "ValorToken"; //  to be approved
+  string public constant symbol  =   "VALOR";      //  to be approved
+  uint8 public constant decimals =   18;           //  to be approved
 
   uint256 public constant INITIAL_SUPPLY = 1e8 * (10 ** uint256(decimals)); //100000000 VALOR. to be approved
 
