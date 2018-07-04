@@ -1,0 +1,26 @@
+{
+  "name": "ValorToken",
+  "version": "1.0.0",
+  "description": "Solidity code for Smart Valor Token",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartvalor/ValorToken.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smartvalor/ValorToken/issues"
+  },
+  "homepage": "https://github.com/smartvalor/ValorToken#readme",
+  "dependencies": {
+    "openzeppelin-solidity": "1.10.0"
+  }
+}
