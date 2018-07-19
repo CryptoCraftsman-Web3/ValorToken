@@ -21,7 +21,7 @@ contract ValorToken is StandardToken {
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
-  constructor() public {
+  constructor() internal {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
