@@ -1,7 +1,8 @@
 pragma solidity ^0.4.24;
 
 
-import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
+
 
 
 /**
@@ -10,7 +11,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `StandardToken` functions.
  */
-contract ValorToken is StandardToken {
+contract ValorToken is StandardBurnableToken {
 
   string public constant name    =   "ValorToken"; //  to be approved
   string public constant symbol  =   "VALOR";      //  to be approved
