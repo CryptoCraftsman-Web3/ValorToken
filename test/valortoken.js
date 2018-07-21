@@ -47,4 +47,56 @@ contract('ValorToken', async (accounts) => {
     assert.equal(luckyAccountBalance.toNumber(), amount);
   });
 
+  /**
+   * let's make a small test to make sure we can burn correctly tokens.
+   * at this point, accounts[1] has balance
+   */
+   it("should burn tokens.", async () => {
+     let burnValue = 5000000;
+     let account = accounts[1];
+
+     // we capture account balance and total supply as this will be decreased.
+     let initialBalance = await valor.balanceOf.call(account);
+     let initialTotalSupply = await valor.totalSupply.call();
+
+     //now lets burn it.
+     await valor.burn.sendTransaction(burnValue, {from: account});
+
+     //now lets check balance and total supply
+     let burnedBalance = await valor.balanceOf.call(account);
+     let totalSupply = await valor.totalSupply.call();
+
+     assert.equal(initialBalance.toNumber(), burnedBalance.toNumber() + burnValue);
+     assert.equal(initialTotalSupply.toNumber(), totalSupply.toNumber() + burnValue);
+   });
+
+   /**
+    * now we will test the burnFrom method that allows another account to burn
+    * tokens from another account
+    */
+    it("Should allow owner to burn tokens in behalf of another account.", async () => {
+      let burnValue = 5000000;
+      let owner = accounts[0];
+      let account = accounts[1]; // this account still has positive balance
+
+      // we authorize owner to transfer or burn on behalf of account.
+      await valor.approve.sendTransaction(owner, burnValue, {from: account});
+
+      // we capture account balance and total supply as this will be decreased.
+      let initialBalance = await valor.balanceOf.call(account);
+      let initialTotalSupply = await valor.totalSupply.call();
+
+      //now lets burn it.
+      await valor.burnFrom.sendTransaction(account, burnValue, {from: owner});
+
+      //now lets check balance and total supply
+      let burnedBalance = await valor.balanceOf.call(account);
+      let totalSupply = await valor.totalSupply.call();
+
+      assert.equal(initialBalance.toNumber(), burnedBalance.toNumber() + burnValue);
+      assert.equal(initialTotalSupply.toNumber(), totalSupply.toNumber() + burnValue);
+    });
+
+
+
 });
