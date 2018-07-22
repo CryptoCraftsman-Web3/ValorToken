@@ -1,9 +1,6 @@
 pragma solidity ^0.4.24;
 
-
 import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
-
-
 
 /**
  * @title ValorToken
@@ -12,7 +9,6 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
  * `StandardToken` functions.
  */
 contract ValorToken is StandardBurnableToken {
-
   string public constant name    =   "ValorToken"; //  to be approved
   string public constant symbol  =   "VALOR";      //  to be approved
   uint8 public constant decimals =   18;           //  to be approved
