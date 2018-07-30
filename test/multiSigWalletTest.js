@@ -20,26 +20,24 @@ contract('MultiSigWallet', (accounts) => {
         assert.ok(issueResult)
 
         let txCount = await multisigInstance.getTransactionCount(true, true);
-        console.log(txCount);
 
         // Encode transfer call for the multisig
         const transferEncoded = valorToken.contract.transfer.getData(accounts[1], 1000000)
 
-         const transactionId = await multisigInstance.submitTransaction.sendTransaction(valorToken.address, 0, transferEncoded, {from: accounts[0]});
+        let transactionId = await multisigInstance.submitTransaction(valorToken.address, 0, transferEncoded, {from: accounts[0]});
 
          txCount = await multisigInstance.getTransactionCount(true, true);
-         console.log(txCount);
 
-        let confirmationCount = await multisigInstance.getConfirmationCount.call(transactionId);
-        console.log ("count " + confirmationCount.toNumber() + " for tx " + transactionId)
-        //assert.equal(1, confirmationCount.toNumber());
-        //const executedTransactionId = await multisigInstance.confirmTransaction.sendTransaction(transactionId, {from: accounts[1]});
+        let confirmationCount = await multisigInstance.getConfirmationCount.call(0);
+
+        assert.equal(1, confirmationCount.toNumber());
+        const executedTransactionId = await multisigInstance.confirmTransaction(0, {from: accounts[1]});
 
 
         // Check that transaction has been executed
         //assert.ok(transactionId.equals(executedTransactionId))
 
           // Check that the transfer has actually occured
-        //assert.equal(1000000, await valorToken.balanceOf(accounts[1]))
+        assert.equal(1000000, await valorToken.balanceOf.call(accounts[1]))
     })
 })
