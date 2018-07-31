@@ -1,3 +1,10 @@
+
+//not nice import, useful to have some helper functions available
+//especially .shoud.be.rejected interface
+//waiting for open-zeppelin helpers.js to remove babel dependencies  
+require ("./util.js");
+
+
 const ValorToken = artifacts.require('./ValorToken.sol');
 
 contract('ValorToken', async (accounts) => {
@@ -68,6 +75,21 @@ contract('ValorToken', async (accounts) => {
 
      assert.equal(initialBalance.toNumber(), burnedBalance.toNumber() + burnValue);
      assert.equal(initialTotalSupply.toNumber(), totalSupply.toNumber() + burnValue);
+   });
+
+  /**
+   * let's make a small test to burn more tokens than your balance
+   */
+   it("shouldn't burn more tokens than his balance", async () => {
+     let account = accounts[1];
+
+     // we capture account balance and total supply as this will be decreased.
+     let initialBalance = await valor.balanceOf.call(account);
+     let initialTotalSupply = await valor.totalSupply.call();
+
+     //now lets burn the balance + 1000.
+     await valor.burn.sendTransaction(initialBalance + 10000, {from: account}).should.be.rejected;
+
    });
 
    /**
