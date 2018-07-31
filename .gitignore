@@ -1,0 +1,6 @@
+# git ignore
+
+# truffle stuff
+node_modules/
+build/
+.env
