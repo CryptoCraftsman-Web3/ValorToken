@@ -19,6 +19,6 @@ import "./MultiSigWallet.sol";
    public
    returns (uint transactionId)
    {
-      submitTransaction(address(this), 0, _data)
+      submitTransaction(address(this), 0, _data);
    }
 }
