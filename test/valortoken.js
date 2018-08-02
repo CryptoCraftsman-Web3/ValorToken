@@ -2,93 +2,91 @@
 //not nice import, useful to have some helper functions available
 //especially .shoud.be.rejected interface
 //waiting for open-zeppelin helpers.js to remove babel dependencies  
-require ("./util.js");
-
+var util = require ("./util.js");
+var BigNumber      = util.BigNumber;
 
 const ValorToken = artifacts.require('./ValorToken.sol');
 
-contract('ValorToken', async (accounts) => {
-  let valor;
+contract('ValorToken', async ([Alice, Bob, Charlie]) => {
+  
 
-  before(async () => {
-     valor = await ValorToken.deployed();
+  beforeEach(async () => {
+     this.valor       = await ValorToken.deployed();
+     this.totalSupply = await this.valor.totalSupply.call();
   });
 
   /**
    * Lets validate that intial supply is equal to total supply.
   */
   it("initial supply is total supply.", async () => {
-    let initialSupply = await valor.INITIAL_SUPPLY.call();
-    let totalSupply = await valor.totalSupply.call();
-    assert.equal(initialSupply.toNumber(), totalSupply.toNumber());
+    console.log(this.totalSupply);
+    (await this.valor.INITIAL_SUPPLY.call()).should.be.bignumber.equal(this.totalSupply);
   });
 
   /**
    * We are giving the initial supply to the owner, let's validate that.
   */
-  it("should give the owner the total supply of tokens.", async () => {
-    let ownerBalance = await valor.balanceOf.call(accounts[0]);
-    let totalSupply = await valor.totalSupply.call();
-    assert.equal(ownerBalance.toNumber(), totalSupply.toNumber());
+  it("should the owner Alice get the total supply of tokens.", async () => {
+   (await this.valor.balanceOf.call(Alice)).should.be.bignumber.equal(this.totalSupply);
   });
 
   /**
    * let's make a small transfer to another account and make sure send is ok.
   */
-  it("should transfer some valor tokens to lucky account.", async () => {
-    const amount = 10000000; // the amount of Valor tokens to send.
-    const owner = accounts[0];
+  it("Alice transfers some valor tokens to Bob account.", async () => {
 
-    // lets get initial balance of owner
-    let initialOwnerBalance = await valor.balanceOf.call(owner);
+    let amount=1000;
+    // lets get initial balance of owner Alice
+    let initialOwnerBalance = await this.valor.balanceOf.call(Alice);
 
-    // perform transfer from owner to new account
-    await valor.transfer.sendTransaction(accounts[1], amount, {from: owner});
+    // perform transfer from Alice to Bob
+    await this.valor.transfer.sendTransaction(Bob, amount, {from: Alice}).should.be.fulfilled;
 
-    let newOwnerBalance = await valor.balanceOf.call(owner);
+    (await this.valor.balanceOf.call(Alice)).should.be.bignumber.equal(initialOwnerBalance.add(-amount));
     // let's make sure owner balance has been updated.
-    assert.equal(initialOwnerBalance.toNumber() - amount, newOwnerBalance.toNumber());
+    
+    (await this.valor.balanceOf.call(Bob)).should.be.bignumber.equal(amount);
 
-    // let's make sure destination account balance has also been updated.
-    let luckyAccountBalance = await valor.balanceOf.call(accounts[1]);
-    assert.equal(luckyAccountBalance.toNumber(), amount);
   });
 
   /**
    * let's make a small test to make sure we can burn correctly tokens.
-   * at this point, accounts[1] has balance
+   * 
    */
-   it("should burn tokens.", async () => {
-     let burnValue = 5000000;
-     let account = accounts[1];
+   it("Bob should burn tokens.", async () => {
+     let burnt = 100;
 
-     // we capture account balance and total supply as this will be decreased.
-     let initialBalance = await valor.balanceOf.call(account);
-     let initialTotalSupply = await valor.totalSupply.call();
 
-     //now lets burn it.
-     await valor.burn.sendTransaction(burnValue, {from: account});
+
+
+    // perform transfer from Alice to Bob, to make sure Bob has enough tokens to burn
+    await this.valor.transfer.sendTransaction(Bob, burnt, {from: Alice}).should.be.fulfilled;
+
+     // we capture Bob balance 
+     let initialBalance = await this.valor.balanceOf.call(Bob);
+
+     //now Bob burns tokens.
+    await this.valor.burn.sendTransaction(burnt, {from: Bob}).should.be.fulfilled;
 
      //now lets check balance and total supply
-     let burnedBalance = await valor.balanceOf.call(account);
-     let totalSupply = await valor.totalSupply.call();
+     let newBalance = await this.valor.balanceOf.call(Bob);
+     let newSupply = await this.valor.totalSupply.call();
 
-     assert.equal(initialBalance.toNumber(), burnedBalance.toNumber() + burnValue);
-     assert.equal(initialTotalSupply.toNumber(), totalSupply.toNumber() + burnValue);
+     newBalance.should.be.bignumber.equal(initialBalance.minus(burnt));
+     newSupply.should.be.bignumber.equal(this.totalSupply.minus(burnt));
    });
 
   /**
    * let's make a small test to burn more tokens than your balance
    */
-   it("shouldn't burn more tokens than his balance", async () => {
-     let account = accounts[1];
-
+   it("Bob shouldn't burn more tokens than in his balance", async () => {
+     
      // we capture account balance and total supply as this will be decreased.
-     let initialBalance = await valor.balanceOf.call(account);
-     let initialTotalSupply = await valor.totalSupply.call();
+     let balance = await this.valor.balanceOf.call(Bob);
+     
 
-     //now lets burn the balance + 1000.
-     await valor.burn.sendTransaction(initialBalance + 10000, {from: account}).should.be.rejected;
+     //now lets try to burn the balance + 1000. Should fail!
+     await this.valor.burn.sendTransaction(balance + 1000, {from: Bob}).should.be.rejected;
 
    });
 
@@ -96,27 +94,28 @@ contract('ValorToken', async (accounts) => {
     * now we will test the burnFrom method that allows another account to burn
     * tokens from another account
     */
-    it("Should allow owner to burn tokens in behalf of another account.", async () => {
-      let burnValue = 5000000;
-      let owner = accounts[0];
-      let account = accounts[1]; // this account still has positive balance
+    it("Bob allows Alice to burn tokens in his behalf", async () => {
+      let burnt = 100;
 
-      // we authorize owner to transfer or burn on behalf of account.
-      await valor.approve.sendTransaction(owner, burnValue, {from: account});
 
-      // we capture account balance and total supply as this will be decreased.
-      let initialBalance = await valor.balanceOf.call(account);
-      let initialTotalSupply = await valor.totalSupply.call();
+      // perform transfer from Alice to Bob, to make sure Bob has  tokens to burn
+      await this.valor.transfer.sendTransaction(Bob, 1000, {from: Alice}).should.be.fulfilled;
 
-      //now lets burn it.
-      await valor.burnFrom.sendTransaction(account, burnValue, {from: owner});
+      // Bob authorizes Alice to transfer or burn .
+      await this.valor.approve.sendTransaction(Alice, burnt, {from: Bob}).should.be.fulfilled;
+
+      // we capture Bob balance and total supply as this will be decreased.
+      let initialBalance = await this.valor.balanceOf.call(Bob);
+
+      //now let Alice burn it.
+      await this.valor.burnFrom.sendTransaction(Bob, burnt, {from: Alice}).should.be.fulfilled;
 
       //now lets check balance and total supply
-      let burnedBalance = await valor.balanceOf.call(account);
-      let totalSupply = await valor.totalSupply.call();
+      let newBalance = await this.valor.balanceOf.call(Bob);
+      let newSupply = await this.valor.totalSupply.call();
 
-      assert.equal(initialBalance.toNumber(), burnedBalance.toNumber() + burnValue);
-      assert.equal(initialTotalSupply.toNumber(), totalSupply.toNumber() + burnValue);
+      newSupply.should.be.bignumber.equal(this.totalSupply.minus(burnt));
+      newBalance.should.be.bignumber.equal(initialBalance.minus(burnt));
     });
 
 
