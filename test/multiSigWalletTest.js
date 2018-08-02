@@ -37,4 +37,46 @@ contract('MultiSigWallet', (accounts) => {
         // Check that the transfer has actually occured
         assert.equal(1000000, await valorToken.balanceOf.call(accounts[1]))
     })
+
+    it('fails when trying to approve a pending transaction by not an owner', async () => {
+        //roles are
+        let approver1 = accounts[0];
+        let approver2 = accounts[1];
+        let tokenHolder = accounts[2];
+        let wrongApprover = accounts[3];
+
+        // Issue tokens to the multisig address
+        const issueResult = await valorToken.transfer(multisigInstance.address, 1000000, {from: approver1})
+
+        // Encode transfer call for the multisig
+        const transferEncoded = valorToken.contract.transfer.getData(tokenHolder, 1000000)
+
+        // we perform an execution in blockchain but don't store the result to get the transactionId
+        // then we perform the real execution and submit the transaction
+        let transactionId = await multisigInstance.submitTransaction.call(valorToken.address, 0, transferEncoded, {from: approver1});
+        await multisigInstance.submitTransaction(valorToken.address, 0, transferEncoded, {from: approver1});
+
+        // let's make sure we already have one confirmation for this transaction
+        let confirmationCount = await multisigInstance.getConfirmationCount.call(transactionId);
+        assert.equal(confirmationCount.toNumber(), 1);
+
+        // here we still don't have enought confirmations, so balance should be empty
+        // By adding a new confirmation from accountOne, we are performing the execution of the transfer
+        assert.equal(0, await valorToken.balanceOf.call(tokenHolder))
+
+        try{
+          await multisigInstance.confirmTransaction(transactionId, {from: wrongApprover});
+          assert.isNotOk("We shouldn't have reached this. Transaction was not reverted.");
+        } catch (Error){
+            // wrongApprover couldn't confirm pending transaction
+            assert.isOk(Error, "Transaction was reverted.");
+        }
+
+        // tokens are still frozen wainting for new approver
+        assert.equal(0, await valorToken.balanceOf.call(tokenHolder))
+
+        // approve and transfer
+        await multisigInstance.confirmTransaction(transactionId, {from: approver2});
+        assert.equal(1000000, await valorToken.balanceOf.call(accounts[1]))
+    })
 })
