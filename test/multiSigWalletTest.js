@@ -3,9 +3,7 @@ const ValorToken = artifacts.require('ValorToken')
 
 contract('MultiSigWallet', (accounts) => {
     let multisigInstance
-    let valorToken
-
-    const requiredConfirmations = 2
+    let valorToken    
 
     beforeEach(async () => {
       multisigInstance = await MultiSigWallet.deployed();
