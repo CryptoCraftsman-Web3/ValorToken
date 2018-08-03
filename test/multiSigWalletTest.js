@@ -42,11 +42,11 @@ contract('MultiSigWallet', (accounts) => {
         //roles are
         let approver1 = accounts[0];
         let approver2 = accounts[1];
-        let tokenHolder = accounts[2];
+        let tokenHolder = accounts[6];
         let wrongApprover = accounts[3];
 
         // Issue tokens to the multisig address
-        const issueResult = await valorToken.transfer(multisigInstance.address, 1000000, {from: approver1})
+        await valorToken.transfer(multisigInstance.address, 1000000, {from: approver1})
 
         // Encode transfer call for the multisig
         const transferEncoded = valorToken.contract.transfer.getData(tokenHolder, 1000000)
@@ -78,5 +78,44 @@ contract('MultiSigWallet', (accounts) => {
         // approve and transfer
         await multisigInstance.confirmTransaction(transactionId, {from: approver2});
         assert.equal(1000000, await valorToken.balanceOf.call(accounts[1]))
+    })
+
+    it(' fails transfer execution if the multisig wallet does not have enought balance', async () => {
+      let smartValorAmount = 1000000
+
+      // let's validate the multisig wallet has no balance.
+      let currentBalance = await valorToken.balanceOf.call(multisigInstance.address)
+      assert.equal(0, currentBalance.toNumber());
+
+      // encode a new transfer transaction
+      const transferEncoded = valorToken.contract.transfer.getData(accounts[5], smartValorAmount)
+
+      // we perform an execution in blockchain but don't store the result to get the transactionId
+      // then we perform the real execution and submit the transaction
+      let transactionId = await multisigInstance.submitTransaction.call(valorToken.address, 0, transferEncoded, {from: accounts[0]});
+      await multisigInstance.submitTransaction(valorToken.address, 0, transferEncoded, {from: accounts[0]});
+
+      // let's make sure we already have one confirmation for this transaction
+      let confirmationCount = await multisigInstance.getConfirmationCount.call(transactionId);
+      assert.equal(confirmationCount.toNumber(), 1);
+
+      // This confirmation is valid, but transfer should not be executed
+      await multisigInstance.confirmTransaction(transactionId, {from: accounts[1]});
+      confirmationCount = await multisigInstance.getConfirmationCount.call(transactionId);
+      // confirmations are ok, but execution is not.
+      assert.equal(confirmationCount.toNumber(), 2);
+      assert.isOk(true, await multisigInstance.isConfirmed.call(transactionId));
+
+      // Check that no transfer happened
+      assert.equal(0, await valorToken.balanceOf.call(accounts[5]))
+
+      // now we will give tokens to the contract and re execute transaction
+      await valorToken.transfer(multisigInstance.address, smartValorAmount, {from: accounts[0]})
+      currentBalance = await valorToken.balanceOf.call(multisigInstance.address)
+      assert.equal(smartValorAmount, currentBalance.toNumber());
+
+      await multisigInstance.executeTransaction(transactionId, {from: accounts[0]});
+      // now tokenHolder should have tokens
+      assert.equal(smartValorAmount, await valorToken.balanceOf.call(accounts[5]));
     })
 })
