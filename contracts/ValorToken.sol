@@ -9,19 +9,51 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
  * `StandardToken` functions.
  */
 contract ValorToken is StandardBurnableToken {
-  string public constant name    =   "ValorToken"; //  to be approved
-  string public constant symbol  =   "VALOR";      //  to be approved
-  uint8 public constant decimals =   18;           //  to be approved
+  string public constant name    =   "ValorToken";
+  string public constant symbol  =   "VALOR";
+  uint8 public constant decimals =   18;
 
-  uint256 public constant INITIAL_SUPPLY = 1e8 * (10 ** uint256(decimals)); //100000000 VALOR. to be approved
+  // initial supply addresses
+  address public employeePool;
+  address public futureDevFund;
+  address public companyWallet;
+
+  // initial supply and distribution of tokens
+  uint256 internal constant decMultiplier = 10 ** uint256(decimals);
+  uint256 public constant INITIAL_SUPPLY = 1e8 * decMultiplier; //100000000 VALOR.
+  // distribution is:
+  // employeePool : 19%
+  // futureDevFund: 26%
+  // companyWallet: 55%
+  uint256 internal constant employeePoolSupply = 1.9e7 * decMultiplier; // 19000000 VALOR
+  uint256 internal constant futureDevFundSupply = 2.6e7 * decMultiplier; // 26000000 VALOR
+  uint256 internal constant companyWalletSupply = 5.5e7 * decMultiplier; // 55000000 VALOR
 
   /**
-   * @dev Constructor that gives msg.sender all of existing tokens.
+   * @dev Constructor that distributes the supply among Employee pool,
+   * @dev Future Dev fund and SmartValor Company.
    */
-  constructor() public {
-    totalSupply_ = INITIAL_SUPPLY;
-    balances[msg.sender] = INITIAL_SUPPLY;
-    emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
-  }
+  constructor(address _employeePool, address _futureDevFund, address _companyWallet) public {
+    require(_employeePool != address(0));
+    require(_futureDevFund != address(0));
+    require(_companyWallet != address(0));
 
+    employeePool  = _employeePool;
+    futureDevFund = _futureDevFund;
+    companyWallet = _companyWallet;
+
+    totalSupply_ = INITIAL_SUPPLY;
+
+    // EmployeePool
+    balances[employeePool] = employeePoolSupply;
+    emit Transfer(address(0), employeePool, employeePoolSupply);
+
+    // FutureDevFund
+    balances[futureDevFund] = futureDevFundSupply;
+    emit Transfer(address(0), futureDevFund, futureDevFundSupply);
+
+    //CompanyWallet
+    balances[companyWallet] = companyWalletSupply;
+    emit Transfer(address(0), companyWallet, companyWalletSupply);
+  }
 }
