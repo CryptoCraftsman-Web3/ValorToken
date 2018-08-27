@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "./ValorTimelock.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 /**
  * @title ValorStakeFactory
@@ -8,18 +9,21 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
  */
 contract ValorStakeFactory is Ownable{
 
-    address public tokenAddress;
+    ERC20 public token;
+    mapping (address => address) public stakes;
 
-    event TimelockedStakeCreated(address beneficiary,uint256 duration, address _owner); 
+    event StakeCreated(address beneficiary,uint256 duration); 
 
     constructor(address _tokenAddress) public{
     	owner = msg.sender;
-    	tokenAddress = _tokenAddress;
+    	token = ERC20(_tokenAddress);
     }
 
 
-    function createTimeLockedStake(address beneficiary, uint256 duration, address _owner) public onlyOwner {
-    	ValorTimelock timelock = new ValorTimelock(tokenAddress, beneficiary, duration, _owner);
-    	
+    function createStake(address beneficiary, uint256 lockPeriod) public onlyOwner {
+        require(stakes[beneficiary] == address(0), "this user has already a stake");
+    	ValorTimelock stake = new ValorTimelock(token, beneficiary, owner, lockPeriod);
+        emit StakeCreated(beneficiary,lockPeriod);
+        stakes[beneficiary] = stake;
     }
 }
