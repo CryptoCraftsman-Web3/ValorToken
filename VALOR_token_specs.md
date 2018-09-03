@@ -3,7 +3,7 @@
 Property | Value 
 --- | --- 
 premined | 100%
-mintable | no, after TGE
+mintable | no after TGE
 burnable | yes, unsold tokens will be burned by Smart Valor team
 max supply anytime| 100 million
 totalSupply | the relation `totalSupply <= max supply`  always holds
