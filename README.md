@@ -1,5 +1,5 @@
 # ValorToken
-Solidity code for Smart Valor Token
+
 Detailed specifications of token smart contract are in file
 
 ```
