@@ -4,6 +4,8 @@
 
 
 var util = require ("./util.js");
+
+
 var BigNumber      = util.BigNumber;
 
 const day = 86400; 
@@ -23,6 +25,9 @@ contract('ValorStakeFactory', async ([companyWallet,someUser,anotherUser]) => {
      //lets build a VALOR token with all funds allocated to companyWallet
      this.token       = await ValorToken.new(companyWallet, companyWallet, companyWallet);
      this.factory     = await ValorStakeFactory.new(this.token.address);
+
+     //lets give some tokens to someUser
+     await this.token.transfer.sendTransaction(someUser, 10000 *VALOR);
     });
 
     it("check factory is built with proper parameters", async () => {
@@ -33,24 +38,35 @@ contract('ValorStakeFactory', async ([companyWallet,someUser,anotherUser]) => {
     });
 
 
-    it("check stake is built with proper parameters", async () => {
-     //console.log("test");
-     await this.factory.createStake.sendTransaction(someUser,1 * day).should.be.fulfilled;
-     let stakeAddress = await this.factory.stakes.call(someUser);
-     console.log("stake addr "+ stakeAddress);
-     let stake = await ValorTimelock.at(stakeAddress);
-     (await stake.beneficiary.call()).should.be.equal(someUser);
+    it.only("stake created by company wallet on behalf of someUser", async () => {
+
+     //someUser approves 5000 VALOR allowance to factory
+     await this.token.approve(this.factory.address, 5000 * VALOR, {from:someUser});
+     
+     //company creates stake (eg. from platform) on behalf of someUser
+    let tx = await this.factory.createStake.sendTransaction(someUser,
+                                                    1 * day, 
+                                                    5000 * VALOR, 
+                                                    {from: companyWallet});
+
+
+    let res = await web3.eth.getTransactionReceipt(tx);
+    
 
     });
 
 
-    it("factory cannot be used by anyone", async () => {
+    it("do not create a stake without tokens staked", async () => {
         await this.factory.createStake.sendTransaction(someUser,1 * day, {from:anotherUser}).should.be.rejected;
     });
 
     it("same user can have multiple different stakes", async () => {
         
     });
+
+
+
+
 
 
 

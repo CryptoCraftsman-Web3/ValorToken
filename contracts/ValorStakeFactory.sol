@@ -3,6 +3,7 @@ pragma solidity ^0.4.24;
 import "./ValorTimelock.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 /**
  * @title ValorStakeFactory
  * @dev ValorStakeFactory creates ValorTimelock objects on demand
@@ -10,20 +11,23 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 contract ValorStakeFactory is Ownable{
 
     ERC20 public token;
-    mapping (address => address) public stakes;
 
-    event StakeCreated(address beneficiary,uint256 duration); 
+    event StakeCreated(address stake, uint256 atStake); 
 
     constructor(address _tokenAddress) public{
-    	owner = msg.sender;
     	token = ERC20(_tokenAddress);
+        owner = msg.sender;
     }
 
 
-    function createStake(address beneficiary, uint256 lockPeriod) public onlyOwner {
-        require(stakes[beneficiary] == address(0), "this user has already a stake");
-    	ValorTimelock stake = new ValorTimelock(token, beneficiary, owner, lockPeriod);
-        emit StakeCreated(beneficiary,lockPeriod);
-        stakes[beneficiary] = stake;
+
+    //creates a stake and tries to transfer the required amount atStake
+    //if transferFrom fails the transaction fails and gas is burnt
+    function createStake(address beneficiary, uint256 lockPeriod, uint256 atStake) 
+    public {
+
+        ValorTimelock stake = new ValorTimelock(token, beneficiary, owner, lockPeriod);
+        token.transferFrom(beneficiary, address(stake), atStake);
+        emit StakeCreated(address(stake), atStake);
     }
 }
