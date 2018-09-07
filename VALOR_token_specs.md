@@ -20,13 +20,13 @@ the number of digits for fractional units | 18
  * Employees pool (EP) 19%
  
  2. After TGE, the CMCW will 
- * transfer to the Company multisig hot wallet (CMHW) all the tokens sold in pre-sale plus tokens for ICO, 45%
+ * transfer to the Company multisig operational wallet (CMOW) all the tokens sold in pre-sale plus tokens for ICO, 45%
  * keep a liquidity reserve of 5%
  * keep network growth funds, 5%
  
  
- 3. After ICO ends, tokens in CMHW will be available for withdrawals.
- * at withdrawal: tokens are sent outbound from the CMHW to the recipient address
- * at deposit: tokens flow from a EOA of user into a generated address per user deposit and finally ends into the CMHW.
+ 3. After ICO ends, tokens in CMOW will be available for withdrawals.
+ * at withdrawal: tokens are sent outbound from the CMOW to the recipient address
+ * at deposit: tokens flow from a EOA of user into a generated address per user deposit and finally ends into the CMOW.
    
 
