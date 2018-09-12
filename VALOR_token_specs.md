@@ -14,7 +14,7 @@ the number of digits for fractional units | 18
   
 ## Sequence of actions during/after TGE
 
-1. At TGE the tokens will be split into three funds whose addresses are hardcoded in the token contract: 
+1. At TGE the tokens will be split into three funds whose addresses are passed to constructor: 
  * Future Development Fund (FDF), 26%
  * Company multisig cold wallet (CMCW) 55%
  * Employees pool (EP) 19%
