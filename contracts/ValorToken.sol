@@ -20,7 +20,7 @@ contract ValorToken is StandardBurnableToken {
     uint256 internal constant VALOR = 10 ** uint256(decimals);
     uint256 public constant INITIAL_SUPPLY = 1e8 * VALOR; //100000000 VALOR.
 
-    // distribution is:
+    // required distribution is:
     // employeePool : 19%
     // futureDevFund: 26%
     // companyWallet: 55%
@@ -29,15 +29,17 @@ contract ValorToken is StandardBurnableToken {
     uint256 internal constant companyWalletSupply = 5.5e7 * VALOR; // 55 000 000 VALOR
 
     /**
-     * @dev Constructor that distributes at once the supply among Employee pool,
-     * @dev Future Dev fund and SmartValor Company.
+     * @dev Constructor that distributes at TGS the supply among three predefined wallets 
+     * @param _employeePool the account of employees pool funds
+     * @param _futureDevFund the account of future development fund
+     * @param _companyWallet the account of company managed cold wallet
      */
     constructor(address _employeePool, address _futureDevFund, address _companyWallet) public {
-        require(_employeePool != address(0),  "0x0 address is not allowed");
-        require(_futureDevFund != address(0), "0x0 address is not allowed");
-        require(_companyWallet != address(0), "0x0 address is not allowed");
+        require(_employeePool  != address(0),  "0x0 address is not allowed");
+        require(_futureDevFund != address(0),  "0x0 address is not allowed");
+        require(_companyWallet != address(0),  "0x0 address is not allowed");
 
-        employeePool = _employeePool;
+        employeePool  = _employeePool;
         futureDevFund = _futureDevFund;
         companyWallet = _companyWallet;
 
