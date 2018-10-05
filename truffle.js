@@ -12,6 +12,8 @@
  *   },
  */
 
+
+
 module.exports = {
    solc: {
     optimizer: {
@@ -31,6 +33,17 @@ module.exports = {
       host: "localhost",
       port: 9545,
       network_id: "*",
+    },
+    ropsten: {
+      provider: function() {
+        const HDWalletProvider=require('truffle-hdwallet-provider');
+        const INFURA_KEY="insert yours";
+        const mnemonic  = "we are 12 words ...";
+        return new HDWalletProvider(mnemonic, 'https://ropsten.infura.io/v3/'+INFURA_KEY);
+      },
+      network_id: '3',
+      gas: 4500000,
+      gasPrice: 100e9,
     }
   }
 
