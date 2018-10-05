@@ -13,7 +13,7 @@ contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,f
 
   beforeEach(async () => {
      this.valor       = await ValorToken.new(employeePool,futureDevFund,companyWallet);
-     this.totalSupply = new BigNumber(100e6 * VALOR);
+     this.totalSupply = new BigNumber(1e8 * VALOR);
 
   });
 

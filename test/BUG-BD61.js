@@ -26,7 +26,7 @@ contract('ValorToken', async ([companyWallet,someUser,employeePool,futureDevFund
   it("all 100M tokens are in the companyWallet - no bug bd61 happens", async () => {
     let balance = await this.valor.balanceOf.call(companyWallet);
     console.log(balance.toNumber());
-    balance.should.be.bignumber.equal(100e6 * VALOR);
+    balance.should.be.bignumber.equal(1e8 * VALOR);
 
   });
 });
