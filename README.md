@@ -13,6 +13,10 @@ This is a Truffle project. So install Truffle framework as described here
 
 https://truffleframework.com/docs/truffle/getting-started/installation
 
+
+solc compiler is required to be 0.4.25
+
+
 clone the repository locally and then run
 ```
 npm install
