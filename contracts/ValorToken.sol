@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.25;
 
 import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
 /**
@@ -41,6 +41,8 @@ contract ValorToken is StandardBurnableToken {
         employeePool  = _employeePool;
         futureDevFund = _futureDevFund;
         companyWallet = _companyWallet;
+
+        assert(INITIAL_SUPPLY == employeePoolSupply + futureDevFundSupply + companyWalletSupply);
 
         totalSupply_ = INITIAL_SUPPLY;
 
