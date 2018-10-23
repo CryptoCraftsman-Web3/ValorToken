@@ -16,10 +16,10 @@ the number of digits for fractional units | 18
 
 1. At TGE the tokens will be split into three funds whose addresses are passed to constructor: 
  * Future Development Fund (FDF), 26%
- * Company multisig cold wallet (CMCW) 55%
+ * Company multisig wallet (CMW) 55%
  * Employees pool (EP) 19%
  
- 2. After TGE, the CMCW will 
+ 2. After TGE, the CMW will 
  * transfer to the Company multisig operational wallet (CMOW) all the tokens sold in pre-sale plus tokens for ICO, 45%
  * keep a liquidity reserve of 5%
  * keep network growth funds, 5%
