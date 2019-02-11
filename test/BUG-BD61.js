@@ -2,11 +2,23 @@
 // in previoius implementation if the 3 beneficiaires were the same account
 // the final balance was wrong
 
-var util = require ("./util.js");
-var BigNumber      = util.BigNumber;
+
+
+
+
+
+const chai = require('chai');
+
+const BN = web3.utils.BN;
+
+const should = chai
+  .use(require('chai-bn')(BN))
+  .should();
+
+  
 
 const ValorToken = artifacts.require('./ValorToken.sol');
-const VALOR = 1e18;
+const VALOR = (new BN(10)).pow(new BN(18));
 
 console.log("[VALOR token] Wrong balances if initial beneficiaries are the same address");
 
@@ -24,9 +36,12 @@ contract('ValorToken', async ([companyWallet,someUser,employeePool,futureDevFund
    * We are giving the initial supply to one account
   */
   it("all 100M tokens are in the companyWallet - no bug bd61 happens", async () => {
+
     let balance = await this.valor.balanceOf.call(companyWallet);
-    console.log(balance.toNumber());
-    balance.should.be.bignumber.equal(1e8 * VALOR);
+    console.log("HERE!!!!");
+
+    console.log("---" + typeof(balance));
+    balance.should.be.bignumber.equal(new BN("100000000").mul(VALOR));
 
   });
 });

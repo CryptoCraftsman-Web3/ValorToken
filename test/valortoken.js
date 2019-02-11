@@ -1,20 +1,24 @@
 
-//not nice import, useful to have some helper functions available
-//especially .shoud.be.rejected interface
-//waiting for open-zeppelin helpers.js to remove babel dependencies
-var util = require ("./util.js");
-var BigNumber      = util.BigNumber;
+const chai = require('chai');
+
+const BN = web3.utils.BN;
+
+const should = chai
+  .use(require('chai-bn')(BN))
+  .use(require('chai-as-promised'))
+  .should();
+
 
 const ValorToken = artifacts.require('./ValorToken.sol');
-const VALOR = 1e18;
+const VALOR = (new BN(10)).pow(new BN(18));
+const mVALOR = (new BN(10)).pow(new BN(15));
 
 contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,futureDevFund]) => {
 
 
   beforeEach(async () => {
      this.valor       = await ValorToken.new(employeePool,futureDevFund,companyWallet);
-     this.totalSupply = new BigNumber(1e8 * VALOR);
-
+     this.totalSupply = new BN(100000000).mul(VALOR); //100 million of VALOR
   });
 
   /**
@@ -28,16 +32,18 @@ contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,f
    * We are giving the initial supply to three accounts, accounts[7], accounts[8] and accounts[9]
   */
   it("should distribute initial tokens to three wallets at TGE", async () => {
-    (await this.valor.balanceOf.call(employeePool)).should.be.bignumber.equal(1.9e+25);
-    (await this.valor.balanceOf.call(futureDevFund)).should.be.bignumber.equal(2.6e+25);
-    (await this.valor.balanceOf.call(companyWallet)).should.be.bignumber.equal(5.5e+25);
+
+    const _1e24 = new BN(10).pow(new BN(24));
+    (await this.valor.balanceOf.call(employeePool)).should.be.bignumber.equal(new BN(19).mul(_1e24));
+    (await this.valor.balanceOf.call(futureDevFund)).should.be.bignumber.equal(new BN(26).mul(_1e24));
+    (await this.valor.balanceOf.call(companyWallet)).should.be.bignumber.equal(new BN(55).mul(_1e24));
   });
 
   /**
    * let's make a small transfer to another account and make sure send is ok.
   */
   it("companyWallet transfers some valor tokens to someUser account.", async () => {
-    let amount=10 * VALOR;
+    let amount=new BN(10).mul(VALOR);//10 VALOR
 
 
     // lets get initial balance of owner companyWallet
@@ -57,7 +63,7 @@ contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,f
    * let's make a approve/tranferFrom
   */
   it("companyWallet approves amount to someUser which transfers funds to anotherUser", async () => {
-    let amount=0.001 * VALOR;
+    let amount=new BN(4).mul(VALOR);//4 VALOR
 
 
     // lets get initial balance of owner companyWallet
@@ -83,7 +89,7 @@ contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,f
    *
    */
    it("someUser should burn tokens.", async () => {
-     let burnt = 100;
+     let burnt = new BN(100).mul(mVALOR); // 100 milli VALOR = 0.1 VALOR
 
     // perform transfer from companyWallet to someUser, to make sure someUser has enough tokens to burn
      await this.valor.transfer.sendTransaction(someUser, burnt, {from: companyWallet}).should.be.fulfilled;
@@ -112,7 +118,7 @@ contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,f
 
 
      //now lets try to burn the balance + 1000. Should fail!
-     await this.valor.burn.sendTransaction(balance + 1000, {from: someUser}).should.be.rejected;
+     await this.valor.burn.sendTransaction(balance.add(new BN(1000)), {from: someUser}).should.be.rejected;
 
    });
 
@@ -121,27 +127,27 @@ contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,f
     * tokens from another account
     */
     it("someUser allows companyWallet to burn tokens in his behalf", async () => {
-      let burnt = 100;
+      let amount = new BN(100).mul(mVALOR); // 100 milli VALOR
 
 
       // perform transfer from companyWallet to someUser, to make sure someUser has  tokens to burn
-      await this.valor.transfer.sendTransaction(someUser, 1000, {from: companyWallet}).should.be.fulfilled;
+      await this.valor.transfer.sendTransaction(someUser, amount, {from: companyWallet}).should.be.fulfilled;
 
       // someUser authorizes companyWallet to transfer or burn .
-      await this.valor.approve.sendTransaction(companyWallet, burnt, {from: someUser}).should.be.fulfilled;
+      await this.valor.approve.sendTransaction(companyWallet, amount, {from: someUser}).should.be.fulfilled;
 
       // we capture someUser balance and total supply as this will be decreased.
       let initialBalance = await this.valor.balanceOf.call(someUser);
 
       //now let companyWallet burn it.
-      await this.valor.burnFrom.sendTransaction(someUser, burnt, {from: companyWallet}).should.be.fulfilled;
+      await this.valor.burnFrom.sendTransaction(someUser, amount, {from: companyWallet}).should.be.fulfilled;
 
       //now lets check balance and total supply
       let newBalance = await this.valor.balanceOf.call(someUser);
       let newSupply = await this.valor.totalSupply.call();
 
-      newSupply.should.be.bignumber.equal(this.totalSupply.minus(burnt));
-      newBalance.should.be.bignumber.equal(initialBalance.minus(burnt));
+      newSupply.should.be.bignumber.equal(this.totalSupply.sub(amount));
+      newBalance.should.be.bignumber.equal(initialBalance.sub(amount));
     });
 
 

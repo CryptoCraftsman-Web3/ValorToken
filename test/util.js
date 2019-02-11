@@ -54,16 +54,8 @@ function latestTime() {
 }
 
 
-const should = require('chai')
-  .use(require('chai-as-promised'))
-  .use(require('chai-bignumber')(BigNumber))
-  .should();
-
-
 
 exports.increaseTime   = increaseTime;
 exports.increaseTimeTo = increaseTimeTo;
 exports.latestTime     = latestTime;
 exports.duration       = duration;
-exports.BigNumber      = BigNumber;
-exports.should         = should;
