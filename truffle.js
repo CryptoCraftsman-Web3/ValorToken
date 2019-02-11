@@ -42,8 +42,8 @@ module.exports = {
     ropsten: {
       provider: function() {
         const HDWalletProvider=require('truffle-hdwallet-provider');
-        const INFURA_KEY="5d7200d2eedb4357b73f2cc14d7891fd";
-        const mnemonic  = "to be or not to be that is the question whether tis";
+        const INFURA_KEY="put key";
+        const mnemonic  = "put menmonics";
         return new HDWalletProvider(mnemonic, 'https://ropsten.infura.io/v3/'+INFURA_KEY);
       },
       network_id: '3',
@@ -53,8 +53,8 @@ module.exports = {
     rinkeby: {
       provider: function() {
         const HDWalletProvider=require('truffle-hdwallet-provider');
-        const INFURA_KEY="5d7200d2eedb4357b73f2cc14d7891fd";
-        const mnemonic  = "to be or not to be that is the question whether tis";
+        const INFURA_KEY="a key";
+        const mnemonic  = "words ...";
         return new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/v3/'+INFURA_KEY);
       },
       network_id: '4',
