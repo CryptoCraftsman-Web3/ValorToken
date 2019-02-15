@@ -21,7 +21,7 @@ module.exports = function(deployer, network, accounts) {
     let testVault2 = "0x04afbc548e9df377141497a058b4000aa617f95f";
     let testVault3 = "0x04afbc548e9df377141497a058b4000aa617f95f";
 
-    console.log("creating contract on ropsten via infura");
+    console.log("creating contract on rinkeby via infura");
     deployer.deploy(ValorToken, testVault1,testVault2,testVault3);
   }
 
