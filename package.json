@@ -21,10 +21,12 @@
   },
   "homepage": "https://github.com/smartvalor/ValorToken#readme",
   "dependencies": {
+    "bn-chai": "^1.0.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
+    "chai-bn": "^0.1.1",
     "openzeppelin-solidity": "1.11.0",
-    "truffle-hdwallet-provider": "0.0.6"
+    "truffle-hdwallet-provider": "^1.0.3"
   }
 }
