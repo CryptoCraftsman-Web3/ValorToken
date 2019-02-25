@@ -6,8 +6,8 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
  */
 contract ValorToken is StandardBurnableToken {
 
-    string public constant name    =   "ValorToken(test)";
-    string public constant symbol  =   "T-VALOR";
+    string public constant name    =   "ValorToken";
+    string public constant symbol  =   "VALOR";
     uint8  public constant decimals =   18;
 
     // initial supply addresses
