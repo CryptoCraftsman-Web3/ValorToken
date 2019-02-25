@@ -7,14 +7,12 @@ https://github.com/smartvalor/ValorToken/blob/master/VALOR_token_specs.md
 
 # Prerequisites
 
-NodeJS 5.0+ recommended
+NodeJS v10.6.0 recommended
 Ganache 1.2.1
-This is a Truffle project. So install Truffle framework as described here 
-
-https://truffleframework.com/docs/truffle/getting-started/installation
+Truffle v5.0.2
 
 
-solc compiler is required to be 0.4.25
+solc compiler is required to be 0.4.25 (strict)
 
 
 clone the repository locally and then run
