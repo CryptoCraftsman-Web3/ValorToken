@@ -10,8 +10,8 @@ const should = chai
 
 
 const ValorToken = artifacts.require('./ValorToken.sol');
-const VALOR = (new BN(10)).pow(new BN(18));
-const mVALOR = (new BN(10)).pow(new BN(15));
+const VALOR = (new BN(10)).pow(new BN(18)); //1 VALOR = 10^18
+const milliVALOR = (new BN(10)).pow(new BN(15));//1 mVALOR = 10^15
 
 contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,futureDevFund]) => {
 
@@ -33,10 +33,10 @@ contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,f
   */
   it("should distribute initial tokens to three wallets at TGE", async () => {
 
-    const _1e24 = new BN(10).pow(new BN(24));
-    (await this.valor.balanceOf.call(employeePool)).should.be.bignumber.equal(new BN(19).mul(_1e24));
-    (await this.valor.balanceOf.call(futureDevFund)).should.be.bignumber.equal(new BN(26).mul(_1e24));
-    (await this.valor.balanceOf.call(companyWallet)).should.be.bignumber.equal(new BN(55).mul(_1e24));
+    //const _1e24 = new BN(10).pow(new BN(24));
+    (await this.valor.balanceOf.call(employeePool)).should.be.bignumber.equal(new BN(19000000).mul(VALOR));
+    (await this.valor.balanceOf.call(futureDevFund)).should.be.bignumber.equal(new BN(26000000).mul(VALOR));
+    (await this.valor.balanceOf.call(companyWallet)).should.be.bignumber.equal(new BN(55000000).mul(VALOR));
   });
 
   /**
@@ -89,7 +89,7 @@ contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,f
    *
    */
    it("someUser should burn tokens.", async () => {
-     let burnt = new BN(100).mul(mVALOR); // 100 milli VALOR = 0.1 VALOR
+     let burnt = new BN(100).mul(milliVALOR); // 100 milli VALOR = 0.1 VALOR
 
     // perform transfer from companyWallet to someUser, to make sure someUser has enough tokens to burn
      await this.valor.transfer.sendTransaction(someUser, burnt, {from: companyWallet}).should.be.fulfilled;
@@ -127,7 +127,7 @@ contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,f
     * tokens from another account
     */
     it("someUser allows companyWallet to burn tokens in his behalf", async () => {
-      let amount = new BN(100).mul(mVALOR); // 100 milli VALOR
+      let amount = new BN(100).mul(milliVALOR); // 100 milli VALOR
 
 
       // perform transfer from companyWallet to someUser, to make sure someUser has  tokens to burn
