@@ -50,6 +50,17 @@ module.exports = {
       gas: 4500000,
       gasPrice: 100e9,
     },
+    mainnet: {
+      provider: function() {
+        const HDWalletProvider=require('truffle-hdwallet-provider');
+        const INFURA_KEY="put key";
+        const mnemonic  = "put menmonics";
+        return new HDWalletProvider(mnemonic, 'https://mainnet.infura.io/v3/'+INFURA_KEY);
+      },
+      network_id: '1',
+      gas: 4500000,
+      gasPrice: 10e9,
+    },    
     rinkeby: {
       provider: function() {
         const HDWalletProvider=require('truffle-hdwallet-provider');
