@@ -104,6 +104,8 @@ contract('ValorToken', async ([companyWallet,someUser,anotherUser,employeePool,f
      let newBalance = await this.valor.balanceOf.call(someUser);
      let newSupply = await this.valor.totalSupply.call();
 
+     console.log(newSupply.toString());
+
      newBalance.should.be.bignumber.equal(initialBalance.sub(burnt));
      newSupply.should.be.bignumber.equal(this.totalSupply.sub(burnt));
    });
